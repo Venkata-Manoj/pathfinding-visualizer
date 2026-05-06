@@ -39,11 +39,10 @@ export function* bidirectionalBFS(grid) {
   while (startQueue.length > 0 && goalQueue.length > 0 && !meetingCell) {
     // Alternate between expanding from start and goal
     if (startQueue.length > 0) {
-      const startResult = expandFrontier(
+      const startResult = yield* expandFrontier(
         startQueue, startVisited, startParents, goalVisited,
         'start', getNeighbors, incrementVisit
       );
-      yield* startResult.steps;
       if (startResult.meeting) {
         meetingCell = startResult.meeting;
         break;
@@ -51,11 +50,10 @@ export function* bidirectionalBFS(grid) {
     }
     
     if (goalQueue.length > 0) {
-      const goalResult = expandFrontier(
+      const goalResult = yield* expandFrontier(
         goalQueue, goalVisited, goalParents, startVisited,
         'goal', getNeighbors, incrementVisit
       );
-      yield* goalResult.steps;
       if (goalResult.meeting) {
         meetingCell = goalResult.meeting;
         break;
@@ -131,11 +129,10 @@ export function* bidirectionalDijkstra(grid) {
     const goalTop = goalPQ.peek();
     
     if (startTop.priority <= goalTop.priority) {
-      const result = expandWeightedFrontier(
+      const result = yield* expandWeightedFrontier(
         startPQ, startDist, startVisited, startParents, goalDist,
         'start', getNeighbors, incrementVisit
       );
-      yield* result.steps;
       
       if (result.meeting) {
         const pathLength = startDist.get(cellKey(result.meeting)) + 
@@ -146,11 +143,10 @@ export function* bidirectionalDijkstra(grid) {
         }
       }
     } else {
-      const result = expandWeightedFrontier(
+      const result = yield* expandWeightedFrontier(
         goalPQ, goalDist, goalVisited, goalParents, startDist,
         'goal', getNeighbors, incrementVisit
       );
-      yield* result.steps;
       
       if (result.meeting) {
         const pathLength = startDist.get(cellKey(result.meeting)) + 

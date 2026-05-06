@@ -18,6 +18,7 @@ import { bfs } from './algorithms/bfs.js';
 import { dfs } from './algorithms/dfs.js';
 import { dijkstra } from './algorithms/dijkstra.js';
 import { astar } from './algorithms/astar.js';
+import { bidirectionalBFS, bidirectionalDijkstra } from './algorithms/bidirectional.js';
 
 // Map of algorithm names to functions
 const ALGORITHMS = {
@@ -25,6 +26,8 @@ const ALGORITHMS = {
   dfs,
   dijkstra,
   astar,
+  bibfs: bidirectionalBFS,
+  bidijkstra: bidirectionalDijkstra,
 };
 
 /**

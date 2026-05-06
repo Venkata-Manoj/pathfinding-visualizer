@@ -37,7 +37,7 @@ export const CONFIG = {
   DRAW_MODES: ['wall', 'weight2', 'weight3', 'eraser'],
   
   // Algorithms
-  ALGORITHMS: ['bfs', 'dfs', 'dijkstra', 'astar'],
+  ALGORITHMS: ['bfs', 'dfs', 'dijkstra', 'astar', 'bibfs', 'bidijkstra'],
   
   // Heuristics for A*
   HEURISTICS: ['manhattan', 'euclidean', 'chebyshev', 'octile'],
@@ -92,6 +92,22 @@ export const ALGORITHM_DESCRIPTIONS = {
     characteristics: ['Weighted', 'Shortest path guaranteed', 'Uses heuristic'],
     timeComplexity: 'O((V + E) log V)',
     spaceComplexity: 'O(V)',
+  },
+  bibfs: {
+    name: 'Bidirectional BFS',
+    short: 'Bi-BFS',
+    description: 'Bidirectional BFS runs two simultaneous searches from the start and goal. It meets in the middle, dramatically reducing the number of explored nodes while still guaranteeing the shortest path in unweighted graphs.',
+    characteristics: ['Unweighted', 'Shortest path guaranteed', 'Very fast'],
+    timeComplexity: 'O(V^(1/2) + E^(1/2))',
+    spaceComplexity: 'O(V^(1/2))',
+  },
+  bidijkstra: {
+    name: "Bidirectional Dijkstra",
+    short: 'Bi-Dijkstra',
+    description: 'Bidirectional Dijkstra runs two simultaneous searches from the start and goal in weighted graphs. It guarantees the shortest path while exploring a significantly smaller area than standard Dijkstra.',
+    characteristics: ['Weighted', 'Shortest path guaranteed', 'Fast'],
+    timeComplexity: 'O((V^(1/2) + E^(1/2)) log V)',
+    spaceComplexity: 'O(V^(1/2))',
   },
 };
 
