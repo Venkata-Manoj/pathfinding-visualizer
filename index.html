@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Interactive pathfinding algorithm visualizer. Visualize BFS, DFS, Dijkstra, and A* algorithms with step-by-step animation, maze generation, and educational explanations.">
+<meta name="application-name" content="Pathfinding Visualizer">
+<meta name="author" content="B V Manoj">
+<meta name="website" content="https://pathfinding-visualizer.vercel.app">
   <meta name="theme-color" content="#3b82f6">
   <meta name="color-scheme" content="light dark">
   
@@ -71,14 +74,9 @@
     <!-- App Content: Canvas and Sidebar side by side -->
     <div class="app-content">
       
-      <!-- Main Content -->
-      <main id="main-content" class="main-content">
-        
-        <!-- Canvas Container -->
-        <div class="canvas-wrapper" role="region" aria-label="Grid visualization">
-          <canvas id="grid-canvas" role="img" aria-label="Interactive grid showing pathfinding algorithm visualization"></canvas>
-        </div>
-        
+      <!-- Main Canvas -->
+      <main class="app-content">
+        <canvas id="grid-canvas" class="grid-canvas" role="img" aria-label="Pathfinding grid visualization"></canvas>
       </main>
 
       <!-- Sidebar / Control Panel -->
@@ -344,14 +342,6 @@
       <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
       <div class="shortcut-list">
         <div class="shortcut-item">
-          <span class="shortcut-description">Run / Pause algorithm</span>
-          <kbd>Space</kbd>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-description">Step forward (when paused)</span>
-          <kbd>S</kbd>
-        </div>
-        <div class="shortcut-item">
           <span class="shortcut-description">Reset grid</span>
           <kbd>R</kbd>
         </div>
@@ -399,8 +389,76 @@
   </div>
 
   <!-- Offline Indicator -->
-  <div id="offline-indicator" class="offline-indicator" role="status" aria-live="polite">
-    You're offline. The app is still fully functional.
+  <div id="offline-indicator" class="hidden">
+    <div class="offline-content">
+      <h2>Offline Mode</h2>
+      <p>You are currently offline. Some features may be unavailable.</p>
+      <button onclick="window.location.reload()">Reload</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer" role="contentinfo" aria-label="Project information and credits">
+    <div class="footer-content">
+      <p>&copy; 2024 Built by <a href="https://www.linkedin.com/in/venkata-manoj/" target="_blank" rel="noopener noreferrer">B V Manoj</a></p>
+      <p>Source code: <a href="https://github.com/Venkata-Manoj/pathfinding-visualizer" target="_blank" rel="noopener noreferrer">GitHub Repository</a></p>
+      <p>Live demo: <a href="https://pathfinding-visualizer.vercel.app" target="_blank" rel="noopener noreferrer">pathfinding-visualizer.vercel.app</a></p>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toast-container" role="region" aria-label="Notifications"></div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="shortcuts-help" class="shortcuts-help" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+    <div class="shortcuts-modal">
+      <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <span class="shortcut-description">Reset grid</span>
+          <kbd>R</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Clear walls</span>
+          <kbd>C</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Undo</span>
+          <kbd>Ctrl</kbd> <kbd>Z</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Redo</span>
+          <kbd>Ctrl</kbd> <kbd>Y</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Wall mode</span>
+          <kbd>1</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Weight 2 mode</span>
+          <kbd>2</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Weight 3 mode</span>
+          <kbd>3</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Eraser mode</span>
+          <kbd>0</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Set start position</span>
+          <kbd>4</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Set goal position</span>
+          <kbd>5</kbd>
+        </div>
+      </div>
+      <button id="close-shortcuts" class="btn btn-primary btn-full-width mt-6">
+        Got it
+      </button>
+    </div>
   </div>
 
   <!-- JavaScript Modules -->

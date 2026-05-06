@@ -276,6 +276,17 @@ MIT License - Free for commercial and personal use
 - **Live Demo**: [https://pathfinding-visualizer.vercel.app](https://pathfinding-visualizer.vercel.app)
 - **GitHub Repository**: [https://github.com/Venkata-Manoj/pathfinding-visualizer](https://github.com/Venkata-Manoj/pathfinding-visualizer)
 - **Documentation**: This README file
+- **Website**: [https://pathfinding-visualizer.vercel.app](https://pathfinding-visualizer.vercel.app) - Interactive web-based pathfinding algorithm visualizer
+
+---
+
+## 👨‍💻 Build & Attribution
+
+**Build by**: V Manoj
+
+**LinkedIn**: [https://www.linkedin.com/in/venkata-manoj/](https://www.linkedin.com/in/venkata-manoj/)
+
+**GitHub**: [https://github.com/Venkata-Manoj/](https://github.com/Venkata-Manoj/)
 
 ---
 
