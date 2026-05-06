@@ -279,6 +279,8 @@ export class AnimationController {
       pathCost: 0,
       stepCount: 0,
     });
+    // Force notify stats listeners even if values didn't change (e.g. already 0)
+    ['visitedCount', 'pathLength', 'pathCost', 'stepCount'].forEach(k => state.forceNotify(k));
     
     this.onStatsUpdate(this.stats);
   }

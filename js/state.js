@@ -79,6 +79,14 @@ class ObservableState {
   }
   
   /**
+   * Force notify all listeners for a key regardless of value change
+   * Used to ensure UI refreshes even when values reset to same value (e.g. 0→0)
+   */
+  forceNotify(key) {
+    this.notify(key, this.state[key]);
+  }
+  
+  /**
    * Get entire state (for debugging)
    */
   getState() {
@@ -104,6 +112,7 @@ export const state = new ObservableState({
   visitedCount: 0,
   pathLength: 0,
   pathCost: 0,
+  stepCount: 0,
   
   // Grid dimensions
   rows: CONFIG.DEFAULT_ROWS,

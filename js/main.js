@@ -11,7 +11,7 @@ import { initTheme } from './ui/theme.js';
 import { initControls } from './ui/controls.js';
 import { showSuccess, showError } from './ui/toast.js';
 import { state } from './state.js';
-import { CONFIG, ALGORITHM_DESCRIPTIONS } from './config.js';
+import { CONFIG, ALGORITHM_DESCRIPTIONS, HEURISTIC_DESCRIPTIONS } from './config.js';
 
 // Algorithm imports
 import { bfs } from './algorithms/bfs.js';
@@ -324,6 +324,7 @@ class PathfindingVisualizer {
   
   /**
    * Update the algorithm explanation panel
+   * Uses ALGORITHM_DESCRIPTIONS from config which contains all 6 algorithms
    */
   updateExplanation(algorithm, status) {
     const descEl = document.getElementById('algorithm-description');
@@ -331,7 +332,29 @@ class PathfindingVisualizer {
     
     if (descEl && algoInfo) {
       descEl.textContent = algoInfo.description;
+    } else if (descEl) {
+      descEl.textContent = 'Select an algorithm to see how it works.';
     }
+    
+    // Also update heuristic display if A* is selected
+    if (algorithm === 'astar') {
+      this.updateHeuristicDisplay(state.get('heuristic') || 'manhattan');
+    } else {
+      const heuristicDisplay = document.getElementById('heuristic-display');
+      if (heuristicDisplay) {
+        heuristicDisplay.textContent = 'Select A* to see heuristic details';
+      }
+    }
+  }
+  
+  /**
+   * Update the heuristic description text
+   */
+  updateHeuristicDisplay(heuristicName) {
+    const heuristicDisplay = document.getElementById('heuristic-display');
+    if (!heuristicDisplay) return;
+    const info = HEURISTIC_DESCRIPTIONS?.[heuristicName];
+    heuristicDisplay.textContent = info?.description || `${heuristicName} heuristic`;
   }
 }
 

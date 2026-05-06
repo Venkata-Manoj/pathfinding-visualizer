@@ -5,6 +5,7 @@
 
 import { state } from '../state.js';
 import { showToast, showSuccess, showError } from './toast.js';
+import { HEURISTIC_DESCRIPTIONS } from '../config.js';
 
 /**
  * Initialize all UI controls
@@ -47,12 +48,21 @@ function initAlgorithmSelect(runAlgorithm, algorithms) {
   });
   
   heuristicSelect?.addEventListener('change', (e) => {
-    state.set('heuristic', e.target.value);
+    const heuristic = e.target.value;
+    state.set('heuristic', heuristic);
+    // Update heuristic description text when user changes it
+    updateHeuristicDisplay(heuristic);
   });
   
-  // Initialize visibility
-  if (select?.value !== 'astar') {
+  // Initialize visibility and description on page load
+  const initialAlgo = select?.value || 'astar';
+  if (initialAlgo !== 'astar') {
     heuristicGroup.style.display = 'none';
+  }
+  // Show initial description
+  updateAlgorithmDescription(initialAlgo);
+  if (initialAlgo === 'astar') {
+    updateHeuristicDisplay(heuristicSelect?.value || 'manhattan');
   }
 }
 
@@ -404,27 +414,27 @@ function toggleHelpModal(show) {
 
 /**
  * Initialize stats display
+ * Subscribes to state and immediately renders current values
  */
 function initStats() {
-  state.subscribe('visitedCount', (value) => {
-    const el = document.getElementById('stat-visited');
-    if (el) el.textContent = value;
-  });
+  const statMap = {
+    visitedCount: 'stat-visited',
+    pathLength:   'stat-length',
+    pathCost:     'stat-cost',
+    stepCount:    'step-count',
+  };
   
-  state.subscribe('pathLength', (value) => {
-    const el = document.getElementById('stat-length');
-    if (el) el.textContent = value;
-  });
-  
-  state.subscribe('pathCost', (value) => {
-    const el = document.getElementById('stat-cost');
-    if (el) el.textContent = value;
-  });
-  
-  state.subscribe('stepCount', (value) => {
-    const el = document.getElementById('stat-steps');
-    if (el) el.textContent = value;
-  });
+  for (const [key, id] of Object.entries(statMap)) {
+    // Set the initial value immediately (shows 0 on load)
+    const el = document.getElementById(id);
+    if (el) el.textContent = state.get(key) ?? 0;
+    
+    // Subscribe to future updates
+    state.subscribe(key, (value) => {
+      const target = document.getElementById(id);
+      if (target) target.textContent = value;
+    });
+  }
 }
 
 /**
@@ -462,6 +472,16 @@ function updateAlgorithmDescription(algorithm) {
   } else if (heuristicEl) {
     heuristicEl.textContent = 'Select A* to see heuristic details';
   }
+}
+
+/**
+ * Update heuristic description text using config data
+ */
+function updateHeuristicDisplay(heuristicName) {
+  const el = document.getElementById('heuristic-display');
+  if (!el) return;
+  const info = HEURISTIC_DESCRIPTIONS[heuristicName];
+  el.textContent = info?.description || `${heuristicName} heuristic`;
 }
 
 export { toggleHelpModal };
