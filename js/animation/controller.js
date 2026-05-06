@@ -140,6 +140,9 @@ export class AnimationController {
     }
     
     const step = result.value;
+    this.stats.steps++;
+    // Update step counter in UI
+    state.set('stepCount', this.stats.steps);
     this.processStep(step);
     this.onStep(step);
     
@@ -274,6 +277,7 @@ export class AnimationController {
       visitedCount: 0,
       pathLength: 0,
       pathCost: 0,
+      stepCount: 0,
     });
     
     this.onStatsUpdate(this.stats);

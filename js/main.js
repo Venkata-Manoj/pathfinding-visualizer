@@ -228,7 +228,9 @@ class PathfindingVisualizer {
       interaction: this.interaction,
       runAlgorithm: () => this.runAlgorithm(),
       algorithms: ALGORITHMS,
-      updateStepCount: (steps) => this.controller.updateStepCount(steps),
+      // FIX Bug #8: removed broken updateStepCount reference (method doesn't exist on controller)
+      // FIX Bug #2/#9: pass renderer so maze buttons can call renderer.draw()
+      renderer: this.renderer,
     });
   }
   
@@ -254,8 +256,9 @@ class PathfindingVisualizer {
     const algorithmName = state.get('algorithm');
     const heuristic = state.get('heuristic');
     
-    // Clear previous path
-    this.controller.clearPath();
+    // FIX Bug #1: fully reset controller stats so visited/path counters start at 0
+    // Use reset() instead of clearPath() to ensure all state is fresh
+    this.controller.reset();
     
     // Get algorithm generator
     const algorithmFn = ALGORITHMS[algorithmName];

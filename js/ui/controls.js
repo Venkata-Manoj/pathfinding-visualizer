@@ -11,14 +11,14 @@ import { showToast, showSuccess, showError } from './toast.js';
  * @param {Object} deps - Dependencies (controller, grid, interaction, etc.)
  */
 export function initControls(deps) {
-  const { controller, grid, interaction, runAlgorithm, algorithms } = deps;
+  const { controller, grid, interaction, runAlgorithm, algorithms, renderer } = deps;
   
   initAlgorithmSelect(runAlgorithm, algorithms);
   initDrawModeButtons(interaction);
   initPlaybackButtons(controller, runAlgorithm);
   initSpeedSlider();
-  initMazeButtons(grid, controller);
-  initFileButtons(grid);
+  initMazeButtons(grid, controller, renderer);
+  initFileButtons(grid, renderer);
   initKeyboardShortcuts(controller, grid, interaction, runAlgorithm);
   initHelpModal();
   initStats();
@@ -116,8 +116,11 @@ function initPlaybackButtons(controller, runAlgorithm) {
   // Step button
   btnStep?.addEventListener('click', () => {
     if (!controller.running) {
+      // Start algorithm then immediately pause at first step
       runAlgorithm();
-      controller.pause();
+      // Use setTimeout(0) to ensure the rAF loop has been scheduled
+      // before we pause, so the first frame processes one step correctly
+      setTimeout(() => controller.pause(), 0);
     } else if (controller.paused) {
       controller.step();
     }
@@ -184,7 +187,7 @@ function updateStepCount(steps) {
 /**
  * Initialize maze generation buttons
  */
-function initMazeButtons(grid, controller) {
+function initMazeButtons(grid, controller, renderer) {
   const btnBacktracker = document.getElementById('btn-maze-backtracker');
   const btnRandom = document.getElementById('btn-maze-random');
   const btnClear = document.getElementById('btn-clear-walls');
@@ -198,13 +201,13 @@ function initMazeButtons(grid, controller) {
     controller.reset();
     const { recursiveBacktracker } = await import('../algorithms/mazes.js');
     
-    // Animate maze generation
+    // Run the generator to completion (applies all wall changes to model)
     const generator = recursiveBacktracker(grid);
-    for (const step of generator) {
-      // Could animate here, but for now just apply immediately
-    }
+    for (const step of generator) { /* consume all steps */ }
     
     grid.saveState();
+    // FIX Bug #2: redraw canvas after walls are updated in model
+    renderer?.draw();
     showSuccess('Recursive backtracker maze generated');
   });
   
@@ -218,6 +221,8 @@ function initMazeButtons(grid, controller) {
     const { generateRandomMaze } = await import('../algorithms/mazes.js');
     generateRandomMaze(grid);
     grid.saveState();
+    // FIX Bug #9: redraw canvas after walls are updated in model
+    renderer?.draw();
     showSuccess('Random maze generated');
   });
   
@@ -229,6 +234,7 @@ function initMazeButtons(grid, controller) {
     
     controller.reset();
     grid.clearWalls();
+    renderer?.draw();
     showToast('Walls cleared', 'info', 1500);
   });
 }
@@ -236,7 +242,7 @@ function initMazeButtons(grid, controller) {
 /**
  * Initialize import/export buttons
  */
-function initFileButtons(grid) {
+function initFileButtons(grid, renderer) {
   const btnExport = document.getElementById('btn-export');
   const btnImport = document.getElementById('btn-import');
   const fileInput = document.getElementById('file-input');
@@ -258,6 +264,7 @@ function initFileButtons(grid) {
     try {
       const { importGrid } = await import('../grid/persistence.js');
       await importGrid(file, grid);
+      renderer?.draw();
       showSuccess('Maze imported successfully');
     } catch (err) {
       showError('Failed to import maze: ' + err.message);
@@ -320,8 +327,13 @@ function initKeyboardShortcuts(controller, grid, interaction, runAlgorithm) {
   };
   
   document.addEventListener('keydown', (e) => {
-    // Skip if user is typing in an input
+    // Skip if user is typing in an input or any form control is focused
+    const activeTag = document.activeElement?.tagName;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+      return;
+    }
+    // Also skip if a select/input has focus (e.g. after tabbing to it)
+    if (activeTag === 'INPUT' || activeTag === 'SELECT' || activeTag === 'TEXTAREA') {
       return;
     }
     
@@ -420,32 +432,35 @@ function initStats() {
  */
 function updateAlgorithmDescription(algorithm) {
   const descEl = document.getElementById('algorithm-description');
-  const currentStepEl = document.getElementById('current-step');
-  const heuristicEl = document.getElementById('heuristic-info');
+  // FIX Bug #6: target heuristic-display (the text div), not heuristic-info (the container)
+  const heuristicEl = document.getElementById('heuristic-display');
   
   const descriptions = {
     bfs: 'BFS explores all nodes at the present depth before moving to the next level. It guarantees the shortest path in unweighted graphs.',
     dfs: 'DFS explores as far as possible along each branch before backtracking. It does not guarantee the shortest path but uses less memory.',
     dijkstra: 'Dijkstra finds the shortest path in weighted graphs. It always expands the node with the lowest known cost from the start.',
     astar: 'A* combines the actual cost from the start with a heuristic estimate to the goal. It finds optimal paths efficiently by prioritizing promising directions.',
+    // FIX Bug #5: add descriptions for bidirectional algorithms
+    bibfs: 'Bidirectional BFS launches simultaneous BFS searches from both the start and goal nodes. When the two frontiers meet, the shortest path is found — often twice as fast as standard BFS.',
+    bidijkstra: 'Bidirectional Dijkstra runs Dijkstra\'s algorithm simultaneously from both start and goal. It terminates when the two searched regions overlap, significantly reducing the number of nodes explored.',
   };
   
   const heuristics = {
-    manhattan: 'Manhattan distance: |x₁-x₂| + |y₁-y₂| - suitable for grids with only horizontal/vertical movement.',
-    euclidean: 'Euclidean distance: √((x₁-x₂)² + (y₁-y₂)²) - true straight-line distance.',
-    chebyshev: 'Chebyshev distance: max(|x₁-x₂|, |y₁-y₂|) - allows diagonal movement.',
-    octile: 'Octile distance: max(|x₁-x₂|, |y₁-y₂|) - optimized for 8-directional movement.',
+    manhattan: 'Manhattan distance: |x₁-x₂| + |y₁-y₂| — best for grids with only horizontal/vertical movement.',
+    euclidean: 'Euclidean distance: √((x₁-x₂)² + (y₁-y₂)²) — true straight-line distance.',
+    chebyshev: 'Chebyshev distance: max(|x₁-x₂|, |y₁-y₂|) — allows diagonal movement with equal cost.',
+    octile: 'Octile distance: optimized for 8-directional movement with √2 diagonal cost.',
   };
   
   if (descEl) {
-    descEl.textContent = descriptions[algorithm] || '';
+    descEl.textContent = descriptions[algorithm] || 'Select an algorithm to see how it works.';
   }
   
   if (heuristicEl && algorithm === 'astar') {
     const heuristic = state.get('heuristic') || 'manhattan';
     heuristicEl.textContent = heuristics[heuristic] || '';
   } else if (heuristicEl) {
-    heuristicEl.textContent = '';
+    heuristicEl.textContent = 'Select A* to see heuristic details';
   }
 }
 
