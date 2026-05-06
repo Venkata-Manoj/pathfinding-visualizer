@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Interactive pathfinding algorithm visualizer. Visualize BFS, DFS, Dijkstra, and A* algorithms with step-by-step animation, maze generation, and educational explanations.">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233b82f6'/%3E%3Cpath d='M8 24h4v-4H8v4zm0-8h4v-4H8v4zm0-8h4V4H8v4zm8 16h8v-4h-8v4zm0-8h8v-4h-8v4zm0-8h8V4h-8v4z' fill='white'/%3E%3C/svg%3E">
+  
+  <!-- Mobile App Support -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PathViz">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%233b82f6'/%3E%3Cpath d='M48 144h24v-24H48v24zm0-48h24V72H48v24zm0-48h24V24H48v24zm48 96h48v-24H96v24zm0-48h48V72H96v24zm0-48h48V24H96v24z' fill='white'/%3E%3C/svg%3E">
+  
+  <!-- Preconnect to external resources (none in this case - zero dependencies) -->
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <title>Pathfinding Visualizer - Interactive Algorithm Visualizer</title>
+</head>
+<body>
+  <a href="#main-content" class="sr-only">Skip to main content</a>
+  
+  <div class="app" role="application" aria-label="Pathfinding Visualizer">
+    
+    <!-- Header -->
+    <header class="app-header" role="banner">
+      <div class="app-title">
+        <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+          <path d="M3 21h7v-7H3v7z"/>
+          <circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/>
+          <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+          <circle cx="17.5" cy="17.5" r="1.5" fill="currentColor"/>
+          <path d="M10 17.5h-3.5v-3.5" stroke-dasharray="2 2"/>
+        </svg>
+        <h1>Pathfinding Visualizer</h1>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn btn-ghost btn-icon theme-toggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <button id="help-btn" class="btn btn-ghost btn-icon" aria-label="Keyboard shortcuts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- App Content: Canvas and Sidebar side by side -->
+    <div class="app-content">
+      
+      <!-- Main Content -->
+      <main id="main-content" class="main-content">
+        
+        <!-- Canvas Container -->
+        <div class="canvas-wrapper" role="region" aria-label="Grid visualization">
+          <canvas id="grid-canvas" role="img" aria-label="Interactive grid showing pathfinding algorithm visualization"></canvas>
+        </div>
+        
+      </main>
+
+      <!-- Sidebar / Control Panel -->
+      <aside class="sidebar" role="complementary" aria-label="Controls">
+      
+      <div class="control-panel">
+        
+        <!-- Algorithm Selection -->
+        <div class="control-group">
+          <label for="algorithm-select" id="algorithm-label">Algorithm</label>
+          <select id="algorithm-select" class="select" aria-labelledby="algorithm-label">
+            <option value="bfs">Breadth-First Search (BFS)</option>
+            <option value="dfs">Depth-First Search (DFS)</option>
+            <option value="dijkstra">Dijkstra's Algorithm</option>
+            <option value="astar" selected>A* Search</option>
+          </select>
+          
+          <!-- Heuristic selector (shown only for A*) -->
+          <div id="heuristic-group" class="control-subgroup">
+            <label for="heuristic-select" id="heuristic-label">Heuristic</label>
+            <select id="heuristic-select" class="select" aria-labelledby="heuristic-label">
+              <option value="manhattan" selected>Manhattan Distance</option>
+              <option value="euclidean">Euclidean Distance</option>
+              <option value="chebyshev">Chebyshev Distance</option>
+              <option value="octile">Octile Distance</option>
+            </select>
+          </div>
+          
+          <!-- Heuristic Info Display -->
+          <div id="heuristic-info" class="control-subgroup">
+            <label for="heuristic-display">Heuristic Info</label>
+            <div id="heuristic-display" class="heuristic-description">
+              Select A* to see heuristic details
+            </div>
+          </div>
+        </div>
+
+        <!-- Draw Mode -->
+        <div class="control-group">
+          <span class="control-label" id="draw-mode-label">Draw Mode</span>
+          <div class="button-group" role="radiogroup" aria-labelledby="draw-mode-label">
+            <button class="btn-mode active" data-mode="wall" aria-pressed="true" aria-label="Draw walls">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18" opacity="0.5"/>
+              </svg>
+              Wall
+            </button>
+            <button class="btn-mode" data-mode="weight2" aria-pressed="false" aria-label="Set weight to 2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M12 8v8M8 12h8" opacity="0.5"/>
+              </svg>
+              2x
+            </button>
+            <button class="btn-mode" data-mode="weight3" aria-pressed="false" aria-label="Set weight to 3">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M12 8v8M8 12h8M8 8l8 8M16 8l-8 8" opacity="0.5"/>
+              </svg>
+              3x
+            </button>
+            <button class="btn-mode" data-mode="eraser" aria-pressed="false" aria-label="Erase cells">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"/>
+                <path d="M17 17L7 7" opacity="0.5"/>
+              </svg>
+              Erase
+            </button>
+          </div>
+          <div class="button-group mt-2" role="radiogroup" aria-label="Set positions">
+            <button class="btn-mode btn-mode-start" data-mode="setstart" aria-pressed="false" aria-label="Set start position">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8l-4 4 4 4M8 12h8" stroke="currentColor"/>
+              </svg>
+              Set Start
+            </button>
+            <button class="btn-mode btn-mode-goal" data-mode="setgoal" aria-pressed="false" aria-label="Set goal position">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16l4-4-4-4M8 12h8" stroke="currentColor"/>
+              </svg>
+              Set Goal
+            </button>
+          </div>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="control-group">
+          <span class="control-label">Playback</span>
+          <div class="playback-controls">
+            <button id="btn-run" class="btn btn-primary" aria-label="Run algorithm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Run
+            </button>
+            <button id="btn-pause" class="btn btn-secondary btn-icon" aria-label="Pause animation" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </button>
+            <button id="btn-step" class="btn btn-secondary btn-icon" aria-label="Step forward">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="5 4 15 12 5 20 5 4"/>
+                <line x1="19" y1="5" x2="19" y2="19"/>
+              </svg>
+            </button>
+            <button id="btn-reset" class="btn btn-secondary btn-icon" aria-label="Reset grid">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Speed Control -->
+        <div class="control-group">
+          <label for="speed-slider">
+            Speed: <span id="speed-value" aria-live="polite">50</span> steps/sec
+          </label>
+          <input type="range" id="speed-slider" min="1" max="200" value="50" 
+                 aria-valuemin="1" aria-valuemax="200" aria-valuenow="50">
+        </div>
+        
+        <!-- Step Counter -->
+        <div class="control-group">
+          <label for="step-counter">
+            Steps: <span id="step-count" aria-live="polite">0</span>
+          </label>
+        </div>
+
+        <!-- Maze Generation -->
+        <div class="control-group">
+          <span class="control-label">Maze</span>
+          <div class="maze-controls">
+            <button id="btn-maze-backtracker" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                <path d="M2 12h20M12 2v20"/>
+                <path d="M7 7h4v4H7zM13 13h4v4h-4z" opacity="0.5"/>
+              </svg>
+              Recursive
+            </button>
+            <button id="btn-maze-random" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M8 8h.01M12 12h.01M16 16h.01M8 12h.01M12 16h.01M12 8h.01M16 12h.01" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              Random
+            </button>
+            <button id="btn-clear-walls" class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              </svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Import/Export -->
+        <div class="control-group">
+          <span class="control-label">Save & Load</span>
+          <div class="file-controls">
+            <button id="btn-export" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export
+            </button>
+            <button id="btn-import" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Import
+            </button>
+            <input type="file" id="file-input" class="file-input" accept=".json" aria-label="Import maze file">
+          </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel" role="region" aria-label="Algorithm statistics">
+          <div class="stat">
+            <span class="stat-label">Visited</span>
+            <span id="stat-visited" class="stat-value" aria-live="polite">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Path</span>
+            <span id="stat-length" class="stat-value" aria-live="polite">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Cost</span>
+            <span id="stat-cost" class="stat-value" aria-live="polite">0</span>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend" role="region" aria-label="Color legend">
+          <div class="legend-item">
+            <span class="legend-color legend-color-start"></span>
+            <span>Start</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color-goal"></span>
+            <span>Goal</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color-wall"></span>
+            <span>Wall</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color-open"></span>
+            <span>Explored</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color-closed"></span>
+            <span>Visited</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color-path"></span>
+            <span>Path</span>
+          </div>
+        </div>
+
+        <!-- Algorithm Explanation Panel -->
+        <div class="explanation-panel" role="region" aria-label="Algorithm explanation">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            How it works
+          </h3>
+          <p id="algorithm-description">
+            A* Search uses a heuristic to find the shortest path efficiently. It balances the cost from the start with an estimate to the goal.
+          </p>
+          <div class="explanation-current hidden" id="explanation-current">
+            <p id="current-step">Algorithm not running</p>
+          </div>
+        </div>
+
+      </div>
+      </aside>
+      
+    </div>
+    
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" role="region" aria-label="Notifications"></div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="shortcuts-help" class="shortcuts-help" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+    <div class="shortcuts-modal">
+      <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+      <div class="shortcut-list">
+        <div class="shortcut-item">
+          <span class="shortcut-description">Run / Pause algorithm</span>
+          <kbd>Space</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Step forward (when paused)</span>
+          <kbd>S</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Reset grid</span>
+          <kbd>R</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Clear walls</span>
+          <kbd>C</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Undo</span>
+          <kbd>Ctrl</kbd> <kbd>Z</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Redo</span>
+          <kbd>Ctrl</kbd> <kbd>Y</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Wall mode</span>
+          <kbd>1</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Weight 2 mode</span>
+          <kbd>2</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Weight 3 mode</span>
+          <kbd>3</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Eraser mode</span>
+          <kbd>0</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Set start position</span>
+          <kbd>4</kbd>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-description">Set goal position</span>
+          <kbd>5</kbd>
+        </div>
+      </div>
+      <button id="close-shortcuts" class="btn btn-primary btn-full-width mt-6">
+        Got it
+      </button>
+    </div>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div id="offline-indicator" class="offline-indicator" role="status" aria-live="polite">
+    You're offline. The app is still fully functional.
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script type="module" src="/js/main.js"></script>
+  
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('/sw.js');
+          console.log('[App] SW registered:', registration.scope);
+          
+          // Listen for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('[App] New version available');
+                // Could show a "Update available" toast here
+              }
+            });
+          });
+        } catch (err) {
+          console.error('[App] SW registration failed:', err);
+        }
+      });
+    }
+    
+    // Online/Offline detection
+    function updateOnlineStatus() {
+      const indicator = document.getElementById('offline-indicator');
+      if (navigator.onLine) {
+        indicator.classList.remove('show');
+      } else {
+        indicator.classList.add('show');
+        setTimeout(() => indicator.classList.remove('show'), 5000);
+      }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+  </script>
+</body>
+</html>

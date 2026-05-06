@@ -1,0 +1,28 @@
+{
+  "name": "Pathfinding Visualizer",
+  "short_name": "PathViz",
+  "description": "Interactive pathfinding algorithm visualizer with BFS, DFS, Dijkstra, and A* algorithms. Features dark mode, maze generation, and step-by-step animation.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "categories": ["education", "developer tools", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%233b82f6'/%3E%3Cpath d='M48 144h24v-24H48v24zm0-48h24V72H48v24zm0-48h24V24H48v24zm48 96h48v-24H96v24zm0-48h48V72H96v24zm0-48h48V24H96v24z' fill='white'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%233b82f6'/%3E%3Cpath d='M128 384h64v-64h-64v64zm0-128h64v-64h-64v64zm0-128h64V64h-64v64zm128 256h128v-64H256v64zm0-128h128v-64H256v64zm0-128h128V64H256v64z' fill='white'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": []
+}

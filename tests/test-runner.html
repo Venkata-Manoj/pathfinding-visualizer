@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathfinding Visualizer - Test Runner</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      line-height: 1.6;
+    }
+    
+    .test-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .test-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .test-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .test-controls {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .test-output {
+      padding: 20px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      background: #f8f9fa;
+      border-radius: 4px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .test-summary {
+      padding: 20px;
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      margin: 20px;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .pass {
+      color: #10b981;
+      font-weight: 600;
+    }
+    
+    .fail {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      font-size: 16px;
+      color: #6b7280;
+    }
+    
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e5e7eb;
+      border-top: 2px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="test-header">
+      <h1>🧪 Pathfinding Visualizer Test Suite</h1>
+      <p>Comprehensive testing for all pathfinding algorithms</p>
+    </div>
+    
+    <div class="test-controls">
+      <button id="run-all-tests" class="btn btn-primary">Run All Tests</button>
+      <button id="clear-output" class="btn btn-secondary">Clear Output</button>
+      <button id="run-specific" class="btn btn-secondary">Run Specific Test</button>
+    </div>
+    
+    <div id="test-output" class="test-output">
+      <div class="loading">
+        <div class="spinner"></div>
+        Click "Run All Tests" to begin testing...
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { runAllTests } from './algorithms.test.js';
+    
+    const output = document.getElementById('test-output');
+    const runAllBtn = document.getElementById('run-all-tests');
+    const clearBtn = document.getElementById('clear-output');
+    
+    function appendOutput(text, className = '') {
+      const div = document.createElement('div');
+      div.textContent = text;
+      if (className) div.className = className;
+      output.appendChild(div);
+      output.scrollTop = output.scrollHeight;
+    }
+    
+    function clearOutput() {
+      output.innerHTML = '';
+    }
+    
+    function showLoading() {
+      output.innerHTML = '<div class="loading"><div class="spinner"></div>Running tests...</div>';
+    }
+    
+    function showSummary(results) {
+      const summary = document.createElement('div');
+      summary.className = 'test-summary';
+      summary.innerHTML = `
+        <h3>📊 Test Results</h3>
+        <p><span class="pass">${results.passed}</span> passed, 
+           <span class="fail">${results.failed}</span> failed out of 
+           <strong>${results.total}</strong> total tests</p>
+        <p>Overall: ${results.failed === 0 ? '✅ All tests passed!' : '❌ Some tests failed'}</p>
+      `;
+      output.appendChild(summary);
+    }
+    
+    // Capture console output
+    const originalLog = console.log;
+    const originalError = console.error;
+    const logOutput = [];
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const message = args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      logOutput.push({ type: 'log', message });
+    };
+    
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      const message = args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      logOutput.push({ type: 'error', message });
+    };
+    
+    runAllBtn.addEventListener('click', async () => {
+      showLoading();
+      logOutput.length = 0;
+      
+      // Small delay to allow UI to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      try {
+        const results = runAllTests();
+        
+        // Display captured output
+        clearOutput();
+        logOutput.forEach(entry => {
+          const div = document.createElement('div');
+          div.textContent = entry.message;
+          div.className = entry.type === 'error' ? 'fail' : '';
+          if (entry.message.includes('✅')) {
+            div.className = 'pass';
+          } else if (entry.message.includes('❌')) {
+            div.className = 'fail';
+          }
+          output.appendChild(div);
+        });
+        
+        showSummary(results);
+        
+      } catch (error) {
+        clearOutput();
+        appendOutput(`Error running tests: ${error.message}`, 'fail');
+        appendOutput(error.stack, 'fail');
+      }
+    });
+    
+    clearBtn.addEventListener('click', () => {
+      clearOutput();
+      appendOutput('Output cleared. Ready for new tests...');
+    });
+    
+    document.getElementById('run-specific').addEventListener('click', () => {
+      const test = prompt('Enter test name (bfs, dfs, dijkstra, astar, performance, edgeCases):');
+      if (test) {
+        clearOutput();
+        appendOutput(`Running specific test: ${test}`);
+        
+        // Import and run specific test
+        import('./algorithms.test.js').then(module => {
+          try {
+            switch (test.toLowerCase()) {
+              case 'bfs':
+                module.testBFS();
+                break;
+              case 'dfs':
+                module.testDFS();
+                break;
+              case 'dijkstra':
+                module.testDijkstra();
+                break;
+              case 'astar':
+                module.testAStar();
+                break;
+              case 'performance':
+                module.testPerformance();
+                break;
+              case 'edgecases':
+                module.testEdgeCases();
+                break;
+              default:
+                appendOutput(`Unknown test: ${test}`, 'fail');
+            }
+          } catch (error) {
+            appendOutput(`Error running ${test}: ${error.message}`, 'fail');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
