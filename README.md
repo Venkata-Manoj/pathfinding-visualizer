@@ -34,6 +34,7 @@ An interactive web-based pathfinding algorithm visualizer with advanced features
 - **Import/Export** - Save and load maze configurations
 
 ### Technical Implementation
+
 - **Web Workers** - Non-blocking algorithm execution for smooth UI performance
 - **ES6+ Modules** - Modern JavaScript with proper module structure
 - **HTML5 Canvas** - Efficient grid rendering and interaction
@@ -50,23 +51,26 @@ An interactive web-based pathfinding algorithm visualizer with advanced features
 - No dependencies required - runs entirely in browser
 
 ### Installation & Running
+
 1. Clone this repository
 2. Open `index.html` in your web browser
 3. Or deploy to Vercel for instant hosting
 
 ### Local Development
+
 ```bash
 # Using Python's built-in server
-```bash
 python -m http.server 8000
 ```
 
-# Using Node.js
+### Using Node.js
+
 ```bash
 npx serve .
 ```
 
-# Using PHP
+### Using PHP
+
 ```bash
 php -S localhost:8000
 ```
@@ -83,11 +87,13 @@ php -S localhost:8000
 6. **Step Through** - Use "Step" button for frame-by-frame control
 
 ### Advanced Features
+
 - **Comparison Mode**: Compare multiple algorithms simultaneously
 - **Performance Dashboard**: View detailed metrics and analytics
 - **Learning Mode** - Interactive tutorials with step-by-step explanations and code highlighting
 
 ### Keyboard Shortcuts
+
 - `1` - Wall mode
 - `2` - Weight 2 mode
 - `3` - Weight 3 mode
@@ -101,7 +107,7 @@ php -S localhost:8000
 
 ## 🏗️ Project Structure
 
-```
+```text
 pathfinding-visualizer/
 ├── index.html                 # Main application entry point
 ├── css/
@@ -158,12 +164,14 @@ pathfinding-visualizer/
 ## 🔧 Configuration
 
 ### Algorithm Settings
+
 - **Grid Size**: Adjustable dimensions (default 20x30)
 - **Animation Speed**: 1-200 steps per second
 - **Weight Values**: 1-3 for different terrain types
 - **Heuristics**: Multiple distance calculation methods for A*
 
 ### Themes
+
 - **Light Theme**: Clean, modern interface
 - **Dark Theme**: Reduced eye strain in low-light environments
 - **High Contrast**: Enhanced accessibility for visually impaired users
@@ -171,6 +179,7 @@ pathfinding-visualizer/
 ## 📊 Performance Features
 
 ### Metrics Tracked
+
 - **Nodes Visited**: Total exploration count
 - **Path Length**: Final path distance
 - **Path Cost**: Weighted sum of path nodes
@@ -178,14 +187,16 @@ pathfinding-visualizer/
 - **Memory Usage**: Peak memory consumption
 
 ### Analytics Tools
+
 - **Real-time Charts**: Performance over time visualization
 - **Comparison Tables**: Side-by-side algorithm analysis
 - **CSV Export**: Data export for external analysis
-- **Performance Insights**: Automated optimization suggestions
+- **Performance Insights**: Automated optimization suggestions 
 
 ## 🎓 Educational Features
 
 ### Learning Mode
+
 - **Step-by-Step Tutorials**: Interactive algorithm walkthroughs
 - **Code Highlighting**: Real-time code visualization
 - **Operation Details**: Explanation of each algorithm step
@@ -193,6 +204,7 @@ pathfinding-visualizer/
 - **Key Concepts**: Educational definitions and explanations
 
 ### Algorithm Explanations
+
 - **BFS**: Level-by-level exploration with queue-based frontier management
 - **DFS**: Deep exploration with stack-based backtracking
 - **Dijkstra**: Cost-based search with priority queue optimization
@@ -201,12 +213,14 @@ pathfinding-visualizer/
 ## 🌐 Deployment
 
 ### Vercel Deployment
+
 - **Automatic HTTPS**: Secure SSL certificate included
 - **Global CDN**: Fast content delivery worldwide
 - **Zero Configuration**: Deploy with `vercel.json`
 - **Custom Domain**: Support for custom domains
 
 ### Build Process
+
 - **No Build Step**: Direct HTML deployment
 - **Static Assets**: All resources served efficiently
 - **Service Worker**: Offline functionality support
@@ -215,12 +229,14 @@ pathfinding-visualizer/
 ## 🧪 Testing
 
 ### Unit Tests
+
 - **Algorithm Correctness**: Path validation and optimality checks
 - **Edge Case Handling**: Boundary conditions and error scenarios
 - **Performance Testing**: Large grid and complex maze validation
 - **Memory Testing**: Resource usage monitoring
 
 ### Interactive Test Runner
+
 - **Browser-based Testing**: Real-time test execution
 - **Visual Results**: Pass/fail indicators with detailed output
 - **Coverage Reporting**: Test result summaries and statistics
@@ -228,6 +244,7 @@ pathfinding-visualizer/
 ## 🔒 Security & Privacy
 
 ### Data Handling
+
 - **Client-side Only**: No server data collection
 - **Local Storage**: Optional save states in browser
 - **No Tracking**: Zero analytics or tracking scripts
@@ -236,6 +253,7 @@ pathfinding-visualizer/
 ## 🤝 Contributing
 
 ### Development Guidelines
+
 - **ES6+ Standards**: Modern JavaScript features
 - **Modular Architecture**: Clear separation of concerns
 - **Type Safety**: TypeScript definitions for development
@@ -243,6 +261,7 @@ pathfinding-visualizer/
 - **Performance**: Optimized rendering and algorithm execution
 
 ### Code Quality
+
 - **Comprehensive Tests**: Unit test coverage for all algorithms
 - **Documentation**: Detailed inline comments and README
 - **Error Handling**: Graceful failure recovery
