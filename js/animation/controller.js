@@ -184,6 +184,7 @@ export class AnimationController {
             visited: step.visitedCount || this.stats.visited,
             pathLength: step.pathLength || this.stats.pathLength,
             pathCost: this.stats.pathCost,
+            steps: this.stats.steps,
           };
         }
         break;
@@ -303,13 +304,16 @@ export class AnimationController {
       visited: 0,
       pathLength: 0,
       pathCost: 0,
+      steps: 0,
     };
     
     state.batch({
       visitedCount: 0,
       pathLength: 0,
       pathCost: 0,
+      stepCount: 0,
     });
+    ['visitedCount', 'pathLength', 'pathCost', 'stepCount'].forEach(k => state.forceNotify(k));
     
     this.onStatsUpdate(this.stats);
     this.renderer.draw();

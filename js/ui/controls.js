@@ -142,29 +142,39 @@ function initPlaybackButtons(controller, runAlgorithm) {
     showToast('Grid reset', 'info', 1500);
   });
   
-  // Update button states based on controller state
-  state.subscribe('isRunning', (isRunning) => {
-    btnRun.disabled = isRunning && !controller.paused;
-    btnPause.disabled = !isRunning;
-    btnStep.disabled = isRunning && !controller.paused;
+  function syncPlaybackButtons() {
+    const running = controller.running;
+    const paused = controller.paused;
+    // Run: enabled when idle or when paused (resume); disabled only while actively animating
+    if (btnRun) btnRun.disabled = running && !paused;
+    if (btnPause) btnPause.disabled = !running;
+    // Step: same as Run — idle (start+pause) or paused single-step
+    if (btnStep) btnStep.disabled = running && !paused;
+  }
+  
+  function updatePauseButtonIcon(isPaused) {
+    if (!btnPause) return;
+    btnPause.innerHTML = isPaused
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+           <polygon points="5 3 19 12 5 21 5 3"/>
+         </svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+           <rect x="6" y="4" width="4" height="16"/>
+           <rect x="14" y="4" width="4" height="16"/>
+         </svg>`;
+  }
+  
+  state.subscribe('isRunning', () => {
+    syncPlaybackButtons();
   });
   
   state.subscribe('isPaused', (isPaused) => {
-    btnRun.disabled = !isPaused;
-    btnPause.disabled = !controller.running;
-    
-    // Update pause button icon
-    if (btnPause) {
-      btnPause.innerHTML = isPaused 
-        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-             <polygon points="5 3 19 12 5 21 5 3"/>
-           </svg>`
-        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-             <rect x="6" y="4" width="4" height="16"/>
-             <rect x="14" y="4" width="4" height="16"/>
-           </svg>`;
-    }
+    syncPlaybackButtons();
+    updatePauseButtonIcon(isPaused);
   });
+  
+  syncPlaybackButtons();
+  updatePauseButtonIcon(state.get('isPaused'));
 }
 
 /**
@@ -182,16 +192,6 @@ function initSpeedSlider() {
       valueDisplay.textContent = speed;
     }
   });
-}
-
-/**
- * Update step count display
- */
-function updateStepCount(steps) {
-  const stepCountDisplay = document.getElementById('step-count');
-  if (stepCountDisplay) {
-    stepCountDisplay.textContent = steps;
-  }
 }
 
 /**
@@ -300,7 +300,7 @@ function initKeyboardShortcuts(controller, grid, interaction, runAlgorithm) {
     's': () => {
       if (!controller.running) {
         runAlgorithm();
-        controller.pause();
+        setTimeout(() => controller.pause(), 0);
       } else if (controller.paused) {
         controller.step();
       }

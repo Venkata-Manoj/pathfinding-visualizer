@@ -37,7 +37,18 @@ function collectSteps(generator) {
     result = generator.next();
   }
   
-  return { steps, result: result.value };
+  // Algorithms yield `{ type: 'done', ... }` then `return;` — iterator value is undefined.
+  let completion = result.value;
+  if (completion == null) {
+    for (let i = steps.length - 1; i >= 0; i--) {
+      const s = steps[i];
+      if (s && s.type === 'done') {
+        completion = s;
+        break;
+      }
+    }
+  }
+  return { steps, result: completion };
 }
 
 function extractPath(steps) {
